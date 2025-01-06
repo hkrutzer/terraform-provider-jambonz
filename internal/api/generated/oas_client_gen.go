@@ -696,7 +696,7 @@ type Invoker interface {
 	// Provision a phone number into inventory from a Voip Carrier.
 	//
 	// POST /PhoneNumbers
-	ProvisionPhoneNumber(ctx context.Context, request OptProvisionPhoneNumberReq) (ProvisionPhoneNumberRes, error)
+	ProvisionPhoneNumber(ctx context.Context, request *ProvisionPhoneNumberReq) (ProvisionPhoneNumberRes, error)
 	// PutTenant invokes putTenant operation.
 	//
 	// Update an MS Teams tenant.
@@ -804,7 +804,7 @@ type Invoker interface {
 	// Update phone number.
 	//
 	// PUT /PhoneNumbers/{PhoneNumberSid}
-	UpdatePhoneNumber(ctx context.Context, request OptPhoneNumber, params UpdatePhoneNumberParams) (UpdatePhoneNumberRes, error)
+	UpdatePhoneNumber(ctx context.Context, request *UpdatePhoneNumberReq, params UpdatePhoneNumberParams) (UpdatePhoneNumberRes, error)
 	// UpdateServiceProvider invokes updateServiceProvider operation.
 	//
 	// Update service provider.
@@ -11331,12 +11331,12 @@ func (c *Client) sendManageSubscription(ctx context.Context, request OptManageSu
 // Provision a phone number into inventory from a Voip Carrier.
 //
 // POST /PhoneNumbers
-func (c *Client) ProvisionPhoneNumber(ctx context.Context, request OptProvisionPhoneNumberReq) (ProvisionPhoneNumberRes, error) {
+func (c *Client) ProvisionPhoneNumber(ctx context.Context, request *ProvisionPhoneNumberReq) (ProvisionPhoneNumberRes, error) {
 	res, err := c.sendProvisionPhoneNumber(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendProvisionPhoneNumber(ctx context.Context, request OptProvisionPhoneNumberReq) (res ProvisionPhoneNumberRes, err error) {
+func (c *Client) sendProvisionPhoneNumber(ctx context.Context, request *ProvisionPhoneNumberReq) (res ProvisionPhoneNumberRes, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
@@ -13116,12 +13116,12 @@ func (c *Client) sendUpdateLeastCostRoutingRoutesAndCarrierEntries(ctx context.C
 // Update phone number.
 //
 // PUT /PhoneNumbers/{PhoneNumberSid}
-func (c *Client) UpdatePhoneNumber(ctx context.Context, request OptPhoneNumber, params UpdatePhoneNumberParams) (UpdatePhoneNumberRes, error) {
+func (c *Client) UpdatePhoneNumber(ctx context.Context, request *UpdatePhoneNumberReq, params UpdatePhoneNumberParams) (UpdatePhoneNumberRes, error) {
 	res, err := c.sendUpdatePhoneNumber(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendUpdatePhoneNumber(ctx context.Context, request OptPhoneNumber, params UpdatePhoneNumberParams) (res UpdatePhoneNumberRes, err error) {
+func (c *Client) sendUpdatePhoneNumber(ctx context.Context, request *UpdatePhoneNumberReq, params UpdatePhoneNumberParams) (res UpdatePhoneNumberRes, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [2]string

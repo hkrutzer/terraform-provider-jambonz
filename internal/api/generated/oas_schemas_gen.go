@@ -12,13 +12,12 @@ import (
 
 // Ref: #/components/schemas/Account
 type Account struct {
-	AccountSid uuid.UUID `json:"account_sid"`
-	Name       string    `json:"name"`
-	SipRealm   OptString `json:"sip_realm"`
-	// Authentication webhook for registration.
-	RegistrationHook            OptWebhook `json:"registration_hook"`
-	DeviceCallingApplicationSid OptUUID    `json:"device_calling_application_sid"`
-	ServiceProviderSid          uuid.UUID  `json:"service_provider_sid"`
+	AccountSid                  uuid.UUID                     `json:"account_sid"`
+	Name                        string                        `json:"name"`
+	SipRealm                    OptNilString                  `json:"sip_realm"`
+	RegistrationHook            OptNilAccountRegistrationHook `json:"registration_hook"`
+	DeviceCallingApplicationSid OptNilUUID                    `json:"device_calling_application_sid"`
+	ServiceProviderSid          uuid.UUID                     `json:"service_provider_sid"`
 }
 
 // GetAccountSid returns the value of AccountSid.
@@ -32,17 +31,17 @@ func (s *Account) GetName() string {
 }
 
 // GetSipRealm returns the value of SipRealm.
-func (s *Account) GetSipRealm() OptString {
+func (s *Account) GetSipRealm() OptNilString {
 	return s.SipRealm
 }
 
 // GetRegistrationHook returns the value of RegistrationHook.
-func (s *Account) GetRegistrationHook() OptWebhook {
+func (s *Account) GetRegistrationHook() OptNilAccountRegistrationHook {
 	return s.RegistrationHook
 }
 
 // GetDeviceCallingApplicationSid returns the value of DeviceCallingApplicationSid.
-func (s *Account) GetDeviceCallingApplicationSid() OptUUID {
+func (s *Account) GetDeviceCallingApplicationSid() OptNilUUID {
 	return s.DeviceCallingApplicationSid
 }
 
@@ -62,17 +61,17 @@ func (s *Account) SetName(val string) {
 }
 
 // SetSipRealm sets the value of SipRealm.
-func (s *Account) SetSipRealm(val OptString) {
+func (s *Account) SetSipRealm(val OptNilString) {
 	s.SipRealm = val
 }
 
 // SetRegistrationHook sets the value of RegistrationHook.
-func (s *Account) SetRegistrationHook(val OptWebhook) {
+func (s *Account) SetRegistrationHook(val OptNilAccountRegistrationHook) {
 	s.RegistrationHook = val
 }
 
 // SetDeviceCallingApplicationSid sets the value of DeviceCallingApplicationSid.
-func (s *Account) SetDeviceCallingApplicationSid(val OptUUID) {
+func (s *Account) SetDeviceCallingApplicationSid(val OptNilUUID) {
 	s.DeviceCallingApplicationSid = val
 }
 
@@ -82,6 +81,105 @@ func (s *Account) SetServiceProviderSid(val uuid.UUID) {
 }
 
 func (*Account) getAccountRes() {}
+
+type AccountRegistrationHook struct {
+	WebhookSid OptUUID                       `json:"webhook_sid"`
+	URL        string                        `json:"url"`
+	Method     AccountRegistrationHookMethod `json:"method"`
+	Username   OptString                     `json:"username"`
+	Password   OptString                     `json:"password"`
+}
+
+// GetWebhookSid returns the value of WebhookSid.
+func (s *AccountRegistrationHook) GetWebhookSid() OptUUID {
+	return s.WebhookSid
+}
+
+// GetURL returns the value of URL.
+func (s *AccountRegistrationHook) GetURL() string {
+	return s.URL
+}
+
+// GetMethod returns the value of Method.
+func (s *AccountRegistrationHook) GetMethod() AccountRegistrationHookMethod {
+	return s.Method
+}
+
+// GetUsername returns the value of Username.
+func (s *AccountRegistrationHook) GetUsername() OptString {
+	return s.Username
+}
+
+// GetPassword returns the value of Password.
+func (s *AccountRegistrationHook) GetPassword() OptString {
+	return s.Password
+}
+
+// SetWebhookSid sets the value of WebhookSid.
+func (s *AccountRegistrationHook) SetWebhookSid(val OptUUID) {
+	s.WebhookSid = val
+}
+
+// SetURL sets the value of URL.
+func (s *AccountRegistrationHook) SetURL(val string) {
+	s.URL = val
+}
+
+// SetMethod sets the value of Method.
+func (s *AccountRegistrationHook) SetMethod(val AccountRegistrationHookMethod) {
+	s.Method = val
+}
+
+// SetUsername sets the value of Username.
+func (s *AccountRegistrationHook) SetUsername(val OptString) {
+	s.Username = val
+}
+
+// SetPassword sets the value of Password.
+func (s *AccountRegistrationHook) SetPassword(val OptString) {
+	s.Password = val
+}
+
+type AccountRegistrationHookMethod string
+
+const (
+	AccountRegistrationHookMethodGET  AccountRegistrationHookMethod = "GET"
+	AccountRegistrationHookMethodPOST AccountRegistrationHookMethod = "POST"
+)
+
+// AllValues returns all AccountRegistrationHookMethod values.
+func (AccountRegistrationHookMethod) AllValues() []AccountRegistrationHookMethod {
+	return []AccountRegistrationHookMethod{
+		AccountRegistrationHookMethodGET,
+		AccountRegistrationHookMethodPOST,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s AccountRegistrationHookMethod) MarshalText() ([]byte, error) {
+	switch s {
+	case AccountRegistrationHookMethodGET:
+		return []byte(s), nil
+	case AccountRegistrationHookMethodPOST:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *AccountRegistrationHookMethod) UnmarshalText(data []byte) error {
+	switch AccountRegistrationHookMethod(data) {
+	case AccountRegistrationHookMethodGET:
+		*s = AccountRegistrationHookMethodGET
+		return nil
+	case AccountRegistrationHookMethodPOST:
+		*s = AccountRegistrationHookMethodPOST
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
 
 // AddLimitForAccountNotFound is response for AddLimitForAccount operation.
 type AddLimitForAccountNotFound struct{}
@@ -4906,6 +5004,51 @@ func (s *MsTeamsTenant) SetTenantFqdn(val string) {
 
 func (*MsTeamsTenant) getTenantRes() {}
 
+// NewNilUUID returns new NilUUID with value set to v.
+func NewNilUUID(v uuid.UUID) NilUUID {
+	return NilUUID{
+		Value: v,
+	}
+}
+
+// NilUUID is nullable uuid.UUID.
+type NilUUID struct {
+	Value uuid.UUID
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilUUID) SetTo(v uuid.UUID) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilUUID) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *NilUUID) SetToNull() {
+	o.Null = true
+	var v uuid.UUID
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilUUID) Get() (v uuid.UUID, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilUUID) Or(d uuid.UUID) uuid.UUID {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptAccount returns new OptAccount with value set to v.
 func NewOptAccount(v Account) OptAccount {
 	return OptAccount{
@@ -6700,6 +6843,69 @@ func (o OptMsTeamsTenant) Or(d MsTeamsTenant) MsTeamsTenant {
 	return d
 }
 
+// NewOptNilAccountRegistrationHook returns new OptNilAccountRegistrationHook with value set to v.
+func NewOptNilAccountRegistrationHook(v AccountRegistrationHook) OptNilAccountRegistrationHook {
+	return OptNilAccountRegistrationHook{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilAccountRegistrationHook is optional nullable AccountRegistrationHook.
+type OptNilAccountRegistrationHook struct {
+	Value AccountRegistrationHook
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilAccountRegistrationHook was set.
+func (o OptNilAccountRegistrationHook) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilAccountRegistrationHook) Reset() {
+	var v AccountRegistrationHook
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilAccountRegistrationHook) SetTo(v AccountRegistrationHook) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilAccountRegistrationHook) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilAccountRegistrationHook) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v AccountRegistrationHook
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilAccountRegistrationHook) Get() (v AccountRegistrationHook, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilAccountRegistrationHook) Or(d AccountRegistrationHook) AccountRegistrationHook {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilString returns new OptNilString with value set to v.
 func NewOptNilString(v string) OptNilString {
 	return OptNilString{
@@ -6763,38 +6969,55 @@ func (o OptNilString) Or(d string) string {
 	return d
 }
 
-// NewOptPhoneNumber returns new OptPhoneNumber with value set to v.
-func NewOptPhoneNumber(v PhoneNumber) OptPhoneNumber {
-	return OptPhoneNumber{
+// NewOptNilUUID returns new OptNilUUID with value set to v.
+func NewOptNilUUID(v uuid.UUID) OptNilUUID {
+	return OptNilUUID{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptPhoneNumber is optional PhoneNumber.
-type OptPhoneNumber struct {
-	Value PhoneNumber
+// OptNilUUID is optional nullable uuid.UUID.
+type OptNilUUID struct {
+	Value uuid.UUID
 	Set   bool
+	Null  bool
 }
 
-// IsSet returns true if OptPhoneNumber was set.
-func (o OptPhoneNumber) IsSet() bool { return o.Set }
+// IsSet returns true if OptNilUUID was set.
+func (o OptNilUUID) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptPhoneNumber) Reset() {
-	var v PhoneNumber
+func (o *OptNilUUID) Reset() {
+	var v uuid.UUID
 	o.Value = v
 	o.Set = false
+	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptPhoneNumber) SetTo(v PhoneNumber) {
+func (o *OptNilUUID) SetTo(v uuid.UUID) {
 	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilUUID) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilUUID) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v uuid.UUID
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptPhoneNumber) Get() (v PhoneNumber, ok bool) {
+func (o OptNilUUID) Get() (v uuid.UUID, ok bool) {
+	if o.Null {
+		return v, false
+	}
 	if !o.Set {
 		return v, false
 	}
@@ -6802,53 +7025,7 @@ func (o OptPhoneNumber) Get() (v PhoneNumber, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptPhoneNumber) Or(d PhoneNumber) PhoneNumber {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptProvisionPhoneNumberReq returns new OptProvisionPhoneNumberReq with value set to v.
-func NewOptProvisionPhoneNumberReq(v ProvisionPhoneNumberReq) OptProvisionPhoneNumberReq {
-	return OptProvisionPhoneNumberReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptProvisionPhoneNumberReq is optional ProvisionPhoneNumberReq.
-type OptProvisionPhoneNumberReq struct {
-	Value ProvisionPhoneNumberReq
-	Set   bool
-}
-
-// IsSet returns true if OptProvisionPhoneNumberReq was set.
-func (o OptProvisionPhoneNumberReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptProvisionPhoneNumberReq) Reset() {
-	var v ProvisionPhoneNumberReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptProvisionPhoneNumberReq) SetTo(v ProvisionPhoneNumberReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptProvisionPhoneNumberReq) Get() (v ProvisionPhoneNumberReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptProvisionPhoneNumberReq) Or(d ProvisionPhoneNumberReq) ProvisionPhoneNumberReq {
+func (o OptNilUUID) Or(d uuid.UUID) uuid.UUID {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -8925,59 +9102,13 @@ func (o OptWebhook) Or(d Webhook) Webhook {
 	return d
 }
 
-// NewOptWebhookMethod returns new OptWebhookMethod with value set to v.
-func NewOptWebhookMethod(v WebhookMethod) OptWebhookMethod {
-	return OptWebhookMethod{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptWebhookMethod is optional WebhookMethod.
-type OptWebhookMethod struct {
-	Value WebhookMethod
-	Set   bool
-}
-
-// IsSet returns true if OptWebhookMethod was set.
-func (o OptWebhookMethod) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptWebhookMethod) Reset() {
-	var v WebhookMethod
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptWebhookMethod) SetTo(v WebhookMethod) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptWebhookMethod) Get() (v WebhookMethod, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptWebhookMethod) Or(d WebhookMethod) WebhookMethod {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // Ref: #/components/schemas/PhoneNumber
 type PhoneNumber struct {
-	PhoneNumberSid uuid.UUID `json:"phone_number_sid"`
-	Number         string    `json:"number"`
-	VoipCarrierSid uuid.UUID `json:"voip_carrier_sid"`
-	AccountSid     OptUUID   `json:"account_sid"`
-	ApplicationSid OptUUID   `json:"application_sid"`
+	PhoneNumberSid uuid.UUID  `json:"phone_number_sid"`
+	Number         string     `json:"number"`
+	VoipCarrierSid uuid.UUID  `json:"voip_carrier_sid"`
+	AccountSid     OptUUID    `json:"account_sid"`
+	ApplicationSid OptNilUUID `json:"application_sid"`
 }
 
 // GetPhoneNumberSid returns the value of PhoneNumberSid.
@@ -9001,7 +9132,7 @@ func (s *PhoneNumber) GetAccountSid() OptUUID {
 }
 
 // GetApplicationSid returns the value of ApplicationSid.
-func (s *PhoneNumber) GetApplicationSid() OptUUID {
+func (s *PhoneNumber) GetApplicationSid() OptNilUUID {
 	return s.ApplicationSid
 }
 
@@ -9026,7 +9157,7 @@ func (s *PhoneNumber) SetAccountSid(val OptUUID) {
 }
 
 // SetApplicationSid sets the value of ApplicationSid.
-func (s *PhoneNumber) SetApplicationSid(val OptUUID) {
+func (s *PhoneNumber) SetApplicationSid(val OptNilUUID) {
 	s.ApplicationSid = val
 }
 
@@ -9274,15 +9405,15 @@ type ProvisionPhoneNumberNotFound struct{}
 func (*ProvisionPhoneNumberNotFound) provisionPhoneNumberRes() {}
 
 type ProvisionPhoneNumberReq struct {
-	AccountSid     OptUUID `json:"account_sid"`
-	ApplicationSid OptUUID `json:"application_sid"`
+	AccountSid     uuid.UUID `json:"account_sid"`
+	ApplicationSid OptUUID   `json:"application_sid"`
 	// Telephone number.
 	Number         string    `json:"number"`
 	VoipCarrierSid uuid.UUID `json:"voip_carrier_sid"`
 }
 
 // GetAccountSid returns the value of AccountSid.
-func (s *ProvisionPhoneNumberReq) GetAccountSid() OptUUID {
+func (s *ProvisionPhoneNumberReq) GetAccountSid() uuid.UUID {
 	return s.AccountSid
 }
 
@@ -9302,7 +9433,7 @@ func (s *ProvisionPhoneNumberReq) GetVoipCarrierSid() uuid.UUID {
 }
 
 // SetAccountSid sets the value of AccountSid.
-func (s *ProvisionPhoneNumberReq) SetAccountSid(val OptUUID) {
+func (s *ProvisionPhoneNumberReq) SetAccountSid(val uuid.UUID) {
 	s.AccountSid = val
 }
 
@@ -11814,10 +11945,40 @@ type UpdatePhoneNumberInternalServerError GeneralError
 
 func (*UpdatePhoneNumberInternalServerError) updatePhoneNumberRes() {}
 
+// UpdatePhoneNumberNoContent is response for UpdatePhoneNumber operation.
+type UpdatePhoneNumberNoContent struct{}
+
+func (*UpdatePhoneNumberNoContent) updatePhoneNumberRes() {}
+
 // UpdatePhoneNumberNotFound is response for UpdatePhoneNumber operation.
 type UpdatePhoneNumberNotFound struct{}
 
 func (*UpdatePhoneNumberNotFound) updatePhoneNumberRes() {}
+
+type UpdatePhoneNumberReq struct {
+	AccountSid     uuid.UUID `json:"account_sid"`
+	ApplicationSid NilUUID   `json:"application_sid"`
+}
+
+// GetAccountSid returns the value of AccountSid.
+func (s *UpdatePhoneNumberReq) GetAccountSid() uuid.UUID {
+	return s.AccountSid
+}
+
+// GetApplicationSid returns the value of ApplicationSid.
+func (s *UpdatePhoneNumberReq) GetApplicationSid() NilUUID {
+	return s.ApplicationSid
+}
+
+// SetAccountSid sets the value of AccountSid.
+func (s *UpdatePhoneNumberReq) SetAccountSid(val uuid.UUID) {
+	s.AccountSid = val
+}
+
+// SetApplicationSid sets the value of ApplicationSid.
+func (s *UpdatePhoneNumberReq) SetApplicationSid(val NilUUID) {
+	s.ApplicationSid = val
+}
 
 type UpdateServiceProviderInternalServerError GeneralError
 
@@ -13381,16 +13542,15 @@ func (s *VoipCarrier) SetSmppEnquireLinkInterval(val OptFloat64) {
 }
 
 func (*VoipCarrier) getVoipCarrierRes()    {}
-func (*VoipCarrier) updatePhoneNumberRes() {}
 func (*VoipCarrier) updateVoipCarrierRes() {}
 
 // Ref: #/components/schemas/Webhook
 type Webhook struct {
-	WebhookSid OptUUID          `json:"webhook_sid"`
-	URL        string           `json:"url"`
-	Method     OptWebhookMethod `json:"method"`
-	Username   OptNilString     `json:"username"`
-	Password   OptNilString     `json:"password"`
+	WebhookSid OptUUID       `json:"webhook_sid"`
+	URL        string        `json:"url"`
+	Method     WebhookMethod `json:"method"`
+	Username   OptString     `json:"username"`
+	Password   OptString     `json:"password"`
 }
 
 // GetWebhookSid returns the value of WebhookSid.
@@ -13404,17 +13564,17 @@ func (s *Webhook) GetURL() string {
 }
 
 // GetMethod returns the value of Method.
-func (s *Webhook) GetMethod() OptWebhookMethod {
+func (s *Webhook) GetMethod() WebhookMethod {
 	return s.Method
 }
 
 // GetUsername returns the value of Username.
-func (s *Webhook) GetUsername() OptNilString {
+func (s *Webhook) GetUsername() OptString {
 	return s.Username
 }
 
 // GetPassword returns the value of Password.
-func (s *Webhook) GetPassword() OptNilString {
+func (s *Webhook) GetPassword() OptString {
 	return s.Password
 }
 
@@ -13429,17 +13589,17 @@ func (s *Webhook) SetURL(val string) {
 }
 
 // SetMethod sets the value of Method.
-func (s *Webhook) SetMethod(val OptWebhookMethod) {
+func (s *Webhook) SetMethod(val WebhookMethod) {
 	s.Method = val
 }
 
 // SetUsername sets the value of Username.
-func (s *Webhook) SetUsername(val OptNilString) {
+func (s *Webhook) SetUsername(val OptString) {
 	s.Username = val
 }
 
 // SetPassword sets the value of Password.
-func (s *Webhook) SetPassword(val OptNilString) {
+func (s *Webhook) SetPassword(val OptString) {
 	s.Password = val
 }
 

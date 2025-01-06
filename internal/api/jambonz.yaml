@@ -1597,6 +1597,7 @@ paths:
       summary: provision a phone number into inventory from a Voip Carrier
       operationId: provisionPhoneNumber
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -1615,6 +1616,7 @@ paths:
                   type: string
                   format: uuid
               required:
+                - account_sid
                 - number
                 - voip_carrier_sid
       responses:
@@ -1727,17 +1729,30 @@ paths:
       summary: update phone number
       operationId: updatePhoneNumber
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PhoneNumber'
+              type: object
+              properties:
+                account_sid:
+                  type: string
+                  format: uuid
+                application_sid:
+                  type: string
+                  format: uuid
+                  nullable: true
+              required:
+                - account_sid
+                - application_sid
       responses:
         204:
           description: phone number updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/VoipCarrier'
+          # This actually returns no content
+          # content:
+          #   application/json:
+          #     schema:
+          #       $ref: '#/components/schemas/VoipCarrier'
         400:
           description: bad request
           content:
@@ -5321,12 +5336,15 @@ components:
           type: string
         sip_realm:
           type: string
+          nullable: true
         registration_hook:
-          $ref: '#/components/schemas/Webhook'
-          description: authentication webhook for registration
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/Webhook'
         device_calling_application_sid:
           type: string
           format: uuid
+          nullable: true
         service_provider_sid:
           type: string
           format: uuid
@@ -5352,7 +5370,9 @@ components:
           $ref: '#/components/schemas/Webhook'
           description: webhhok for reporting call status events
         messaging_hook:
-          $ref: '#/components/schemas/Webhook'
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/Webhook'
           description: application webhook for inbound SMS/MMS
         speech_synthesis_vendor:
           type: string
@@ -5366,6 +5386,8 @@ components:
         - application_sid
         - name
         - account_sid
+        - call_hook
+        - call_status_hook
     ApiKey:
       type: object
       properties:
@@ -5410,6 +5432,7 @@ components:
         application_sid:
           type: string
           format: uuid
+          nullable: true
       required:
         - phone_number_sid
         - number
@@ -5447,14 +5470,14 @@ components:
           enum:
             - GET
             - POST
+          default: POST
         username:
           type: string
-          nullable: true
         password:
           type: string
-          nullable: true
       required:
         - url
+        - method
       example: {"url": "https://acme.com", "method": "POST"}
     MsTeamsTenant:
       type: object
