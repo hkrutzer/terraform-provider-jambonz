@@ -42,12 +42,12 @@ func (p *JambonzProvider) Schema(ctx context.Context, req provider.SchemaRequest
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"endpoint": schema.StringAttribute{
-				MarkdownDescription: "Jambonz API endpoint",
-				Required:            true,
+				Description: "Jambonz API endpoint. May also be provided via the JAMBONZ_ENDPOINT environment variable.",
+				Required:    true,
 			},
 			"api_key": schema.StringAttribute{
-				MarkdownDescription: "Jambonz API key",
-				Required:            true,
+				Description: "Jambonz API key. May also be provided via the JAMBONZ_API_KEY environment variable.",
+				Required:    true,
 			},
 		},
 	}
