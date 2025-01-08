@@ -22,6 +22,14 @@ func OptNilStringToStringType(s api.OptNilString) types.String {
 	}
 }
 
+func NilStringToStringType(s api.NilString) types.String {
+	if value, ok := s.Get(); ok {
+		return types.StringValue(value)
+	} else {
+		return types.StringNull()
+	}
+}
+
 func OptUuidToStringType(s api.OptUUID) types.String {
 	if value, ok := s.Get(); ok {
 		return types.StringValue(value.String())

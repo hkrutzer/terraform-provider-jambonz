@@ -21,11 +21,6 @@ type AddSpeechCredentialForSeerviceProviderParams struct {
 	ServiceProviderSid uuid.UUID
 }
 
-// ApplicationsApplicationSidGetParams is parameters of GET /Applications/{ApplicationSid} operation.
-type ApplicationsApplicationSidGetParams struct {
-	ApplicationSid string
-}
-
 // CheckAvailabilityParams is parameters of checkAvailability operation.
 type CheckAvailabilityParams struct {
 	Type  CheckAvailabilityType
@@ -191,6 +186,11 @@ type GetAccountApiKeysParams struct {
 // GetAccountLimitsParams is parameters of getAccountLimits operation.
 type GetAccountLimitsParams struct {
 	AccountSid uuid.UUID
+}
+
+// GetApplicationParams is parameters of getApplication operation.
+type GetApplicationParams struct {
+	ApplicationSid string
 }
 
 // GetCallParams is parameters of getCall operation.

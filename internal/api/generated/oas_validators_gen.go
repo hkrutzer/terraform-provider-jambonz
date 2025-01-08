@@ -81,15 +81,8 @@ func (s *Application) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.CallHook.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if err := s.CallHook.Validate(); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -99,15 +92,8 @@ func (s *Application) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.CallStatusHook.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if err := s.CallStatusHook.Validate(); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -117,15 +103,8 @@ func (s *Application) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.MessagingHook.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if err := s.MessagingHook.Validate(); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -134,10 +113,32 @@ func (s *Application) Validate() error {
 			Error: err,
 		})
 	}
+	if err := func() error {
+		if err := s.RecordAllCalls.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "record_all_calls",
+			Error: err,
+		})
+	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
+}
+
+func (s ApplicationRecordAllCalls) Validate() error {
+	switch s {
+	case 0:
+		return nil
+	case 1:
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
 }
 
 func (s *Call) Validate() error {
@@ -330,15 +331,19 @@ func (s *CreateApplicationReq) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.MessagingHook.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if err := s.RecordAllCalls.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "record_all_calls",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := s.MessagingHook.Validate(); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -351,6 +356,17 @@ func (s *CreateApplicationReq) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
+}
+
+func (s CreateApplicationReqRecordAllCalls) Validate() error {
+	switch s {
+	case 0:
+		return nil
+	case 1:
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
 }
 
 func (s *CreateCallReq) Validate() error {
@@ -2687,6 +2703,73 @@ func (s TestSpeechCredentialOKTtsStatus) Validate() error {
 	case "fail":
 		return nil
 	case "not tested":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *UpdateApplicationReq) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.CallHook.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "call_hook",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := s.CallStatusHook.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "call_status_hook",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := s.MessagingHook.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "messaging_hook",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if err := s.RecordAllCalls.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "record_all_calls",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s UpdateApplicationReqRecordAllCalls) Validate() error {
+	switch s {
+	case 0:
+		return nil
+	case 1:
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)

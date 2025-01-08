@@ -65,9 +65,12 @@ func (d *accountDataSource) Schema(_ context.Context, req datasource.SchemaReque
 					},
 					"username": schema.StringAttribute{
 						Computed: true,
+						Optional: true,
 					},
 					"password": schema.StringAttribute{
-						Computed: true,
+						Computed:  true,
+						Optional:  true,
+						Sensitive: true,
 					},
 				},
 			},
@@ -133,8 +136,8 @@ func (d *accountDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			data.RegistrationHook.WebhookSID = OptUuidToStringType(registration_hook.WebhookSid)
 			data.RegistrationHook.URL = types.StringValue(registration_hook.URL)
 			data.RegistrationHook.Method = types.StringValue(string(registration_hook.Method))
-			data.RegistrationHook.Username = OptStringToStringType(registration_hook.Username)
-			data.RegistrationHook.Password = OptStringToStringType(registration_hook.Password)
+			data.RegistrationHook.Username = NilStringToStringType(registration_hook.Username)
+			data.RegistrationHook.Password = NilStringToStringType(registration_hook.Password)
 		}
 	default:
 		resp.Diagnostics.AddError("Failed to fetch Account", fmt.Sprintf("%+v", p))
@@ -150,12 +153,12 @@ type accountDataSourceModel struct {
 	AccountSID                  types.String  `tfsdk:"account_sid"`
 	Name                        types.String  `tfsdk:"name"`
 	SipRealm                    types.String  `tfsdk:"sip_realm"`
-	RegistrationHook            *webhookModel `tfsdk:"registration_hook"`
+	RegistrationHook            *WebhookModel `tfsdk:"registration_hook"`
 	DeviceCallingApplicationSID types.String  `tfsdk:"device_calling_application_sid"`
 	ServiceProviderSID          types.String  `tfsdk:"service_provider_sid"`
 }
 
-type webhookModel struct {
+type WebhookModel struct {
 	WebhookSID types.String `tfsdk:"webhook_sid"`
 	URL        types.String `tfsdk:"url"`
 	Method     types.String `tfsdk:"method"`

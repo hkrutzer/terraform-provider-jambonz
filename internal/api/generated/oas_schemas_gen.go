@@ -86,8 +86,8 @@ type AccountRegistrationHook struct {
 	WebhookSid OptUUID                       `json:"webhook_sid"`
 	URL        string                        `json:"url"`
 	Method     AccountRegistrationHookMethod `json:"method"`
-	Username   OptString                     `json:"username"`
-	Password   OptString                     `json:"password"`
+	Username   NilString                     `json:"username"`
+	Password   NilString                     `json:"password"`
 }
 
 // GetWebhookSid returns the value of WebhookSid.
@@ -106,12 +106,12 @@ func (s *AccountRegistrationHook) GetMethod() AccountRegistrationHookMethod {
 }
 
 // GetUsername returns the value of Username.
-func (s *AccountRegistrationHook) GetUsername() OptString {
+func (s *AccountRegistrationHook) GetUsername() NilString {
 	return s.Username
 }
 
 // GetPassword returns the value of Password.
-func (s *AccountRegistrationHook) GetPassword() OptString {
+func (s *AccountRegistrationHook) GetPassword() NilString {
 	return s.Password
 }
 
@@ -131,12 +131,12 @@ func (s *AccountRegistrationHook) SetMethod(val AccountRegistrationHookMethod) {
 }
 
 // SetUsername sets the value of Username.
-func (s *AccountRegistrationHook) SetUsername(val OptString) {
+func (s *AccountRegistrationHook) SetUsername(val NilString) {
 	s.Username = val
 }
 
 // SetPassword sets the value of Password.
-func (s *AccountRegistrationHook) SetPassword(val OptString) {
+func (s *AccountRegistrationHook) SetPassword(val NilString) {
 	s.Password = val
 }
 
@@ -283,15 +283,12 @@ type Application struct {
 	Name           string    `json:"name"`
 	AccountSid     uuid.UUID `json:"account_sid"`
 	// Application webhook for inbound voice calls.
-	CallHook OptWebhook `json:"call_hook"`
-	// Webhhok for reporting call status events.
-	CallStatusHook OptWebhook `json:"call_status_hook"`
+	CallHook Webhook `json:"call_hook"`
+	// Webhook for reporting call status events.
+	CallStatusHook Webhook `json:"call_status_hook"`
 	// Application webhook for inbound SMS/MMS.
-	MessagingHook            OptWebhook `json:"messaging_hook"`
-	SpeechSynthesisVendor    OptString  `json:"speech_synthesis_vendor"`
-	SpeechSynthesisVoice     OptString  `json:"speech_synthesis_voice"`
-	SpeechRecognizerVendor   OptString  `json:"speech_recognizer_vendor"`
-	SpeechRecognizerLanguage OptString  `json:"speech_recognizer_language"`
+	MessagingHook  Webhook                   `json:"messaging_hook"`
+	RecordAllCalls ApplicationRecordAllCalls `json:"record_all_calls"`
 }
 
 // GetApplicationSid returns the value of ApplicationSid.
@@ -310,38 +307,23 @@ func (s *Application) GetAccountSid() uuid.UUID {
 }
 
 // GetCallHook returns the value of CallHook.
-func (s *Application) GetCallHook() OptWebhook {
+func (s *Application) GetCallHook() Webhook {
 	return s.CallHook
 }
 
 // GetCallStatusHook returns the value of CallStatusHook.
-func (s *Application) GetCallStatusHook() OptWebhook {
+func (s *Application) GetCallStatusHook() Webhook {
 	return s.CallStatusHook
 }
 
 // GetMessagingHook returns the value of MessagingHook.
-func (s *Application) GetMessagingHook() OptWebhook {
+func (s *Application) GetMessagingHook() Webhook {
 	return s.MessagingHook
 }
 
-// GetSpeechSynthesisVendor returns the value of SpeechSynthesisVendor.
-func (s *Application) GetSpeechSynthesisVendor() OptString {
-	return s.SpeechSynthesisVendor
-}
-
-// GetSpeechSynthesisVoice returns the value of SpeechSynthesisVoice.
-func (s *Application) GetSpeechSynthesisVoice() OptString {
-	return s.SpeechSynthesisVoice
-}
-
-// GetSpeechRecognizerVendor returns the value of SpeechRecognizerVendor.
-func (s *Application) GetSpeechRecognizerVendor() OptString {
-	return s.SpeechRecognizerVendor
-}
-
-// GetSpeechRecognizerLanguage returns the value of SpeechRecognizerLanguage.
-func (s *Application) GetSpeechRecognizerLanguage() OptString {
-	return s.SpeechRecognizerLanguage
+// GetRecordAllCalls returns the value of RecordAllCalls.
+func (s *Application) GetRecordAllCalls() ApplicationRecordAllCalls {
+	return s.RecordAllCalls
 }
 
 // SetApplicationSid sets the value of ApplicationSid.
@@ -360,46 +342,41 @@ func (s *Application) SetAccountSid(val uuid.UUID) {
 }
 
 // SetCallHook sets the value of CallHook.
-func (s *Application) SetCallHook(val OptWebhook) {
+func (s *Application) SetCallHook(val Webhook) {
 	s.CallHook = val
 }
 
 // SetCallStatusHook sets the value of CallStatusHook.
-func (s *Application) SetCallStatusHook(val OptWebhook) {
+func (s *Application) SetCallStatusHook(val Webhook) {
 	s.CallStatusHook = val
 }
 
 // SetMessagingHook sets the value of MessagingHook.
-func (s *Application) SetMessagingHook(val OptWebhook) {
+func (s *Application) SetMessagingHook(val Webhook) {
 	s.MessagingHook = val
 }
 
-// SetSpeechSynthesisVendor sets the value of SpeechSynthesisVendor.
-func (s *Application) SetSpeechSynthesisVendor(val OptString) {
-	s.SpeechSynthesisVendor = val
+// SetRecordAllCalls sets the value of RecordAllCalls.
+func (s *Application) SetRecordAllCalls(val ApplicationRecordAllCalls) {
+	s.RecordAllCalls = val
 }
 
-// SetSpeechSynthesisVoice sets the value of SpeechSynthesisVoice.
-func (s *Application) SetSpeechSynthesisVoice(val OptString) {
-	s.SpeechSynthesisVoice = val
+func (*Application) getApplicationRes() {}
+
+type ApplicationRecordAllCalls int
+
+const (
+	ApplicationRecordAllCalls0 ApplicationRecordAllCalls = 0
+	ApplicationRecordAllCalls1 ApplicationRecordAllCalls = 1
+)
+
+// AllValues returns all ApplicationRecordAllCalls values.
+func (ApplicationRecordAllCalls) AllValues() []ApplicationRecordAllCalls {
+	return []ApplicationRecordAllCalls{
+		ApplicationRecordAllCalls0,
+		ApplicationRecordAllCalls1,
+	}
 }
-
-// SetSpeechRecognizerVendor sets the value of SpeechRecognizerVendor.
-func (s *Application) SetSpeechRecognizerVendor(val OptString) {
-	s.SpeechRecognizerVendor = val
-}
-
-// SetSpeechRecognizerLanguage sets the value of SpeechRecognizerLanguage.
-func (s *Application) SetSpeechRecognizerLanguage(val OptString) {
-	s.SpeechRecognizerLanguage = val
-}
-
-func (*Application) applicationsApplicationSidGetRes() {}
-
-// ApplicationsApplicationSidGetNotFound is response for ApplicationsApplicationSidGet operation.
-type ApplicationsApplicationSidGetNotFound struct{}
-
-func (*ApplicationsApplicationSidGetNotFound) applicationsApplicationSidGetRes() {}
 
 type BearerAuth struct {
 	Token string
@@ -945,15 +922,9 @@ type CreateApplicationReq struct {
 	// Application webhook to handle inbound voice calls.
 	CallHook Webhook `json:"call_hook"`
 	// Webhook to report call status events.
-	CallStatusHook Webhook `json:"call_status_hook"`
-	// Application webhook to handle inbound SMS/MMS messages.
-	MessagingHook OptWebhook `json:"messaging_hook"`
-	// Voice Application Json, call_hook will not be invoked if app_json is provided.
-	AppJSON                  OptString `json:"app_json"`
-	SpeechSynthesisVendor    OptString `json:"speech_synthesis_vendor"`
-	SpeechSynthesisVoice     OptString `json:"speech_synthesis_voice"`
-	SpeechRecognizerVendor   OptString `json:"speech_recognizer_vendor"`
-	SpeechRecognizerLanguage OptString `json:"speech_recognizer_language"`
+	CallStatusHook Webhook                            `json:"call_status_hook"`
+	RecordAllCalls CreateApplicationReqRecordAllCalls `json:"record_all_calls"`
+	MessagingHook  Webhook                            `json:"messaging_hook"`
 }
 
 // GetName returns the value of Name.
@@ -976,34 +947,14 @@ func (s *CreateApplicationReq) GetCallStatusHook() Webhook {
 	return s.CallStatusHook
 }
 
+// GetRecordAllCalls returns the value of RecordAllCalls.
+func (s *CreateApplicationReq) GetRecordAllCalls() CreateApplicationReqRecordAllCalls {
+	return s.RecordAllCalls
+}
+
 // GetMessagingHook returns the value of MessagingHook.
-func (s *CreateApplicationReq) GetMessagingHook() OptWebhook {
+func (s *CreateApplicationReq) GetMessagingHook() Webhook {
 	return s.MessagingHook
-}
-
-// GetAppJSON returns the value of AppJSON.
-func (s *CreateApplicationReq) GetAppJSON() OptString {
-	return s.AppJSON
-}
-
-// GetSpeechSynthesisVendor returns the value of SpeechSynthesisVendor.
-func (s *CreateApplicationReq) GetSpeechSynthesisVendor() OptString {
-	return s.SpeechSynthesisVendor
-}
-
-// GetSpeechSynthesisVoice returns the value of SpeechSynthesisVoice.
-func (s *CreateApplicationReq) GetSpeechSynthesisVoice() OptString {
-	return s.SpeechSynthesisVoice
-}
-
-// GetSpeechRecognizerVendor returns the value of SpeechRecognizerVendor.
-func (s *CreateApplicationReq) GetSpeechRecognizerVendor() OptString {
-	return s.SpeechRecognizerVendor
-}
-
-// GetSpeechRecognizerLanguage returns the value of SpeechRecognizerLanguage.
-func (s *CreateApplicationReq) GetSpeechRecognizerLanguage() OptString {
-	return s.SpeechRecognizerLanguage
 }
 
 // SetName sets the value of Name.
@@ -1026,34 +977,29 @@ func (s *CreateApplicationReq) SetCallStatusHook(val Webhook) {
 	s.CallStatusHook = val
 }
 
+// SetRecordAllCalls sets the value of RecordAllCalls.
+func (s *CreateApplicationReq) SetRecordAllCalls(val CreateApplicationReqRecordAllCalls) {
+	s.RecordAllCalls = val
+}
+
 // SetMessagingHook sets the value of MessagingHook.
-func (s *CreateApplicationReq) SetMessagingHook(val OptWebhook) {
+func (s *CreateApplicationReq) SetMessagingHook(val Webhook) {
 	s.MessagingHook = val
 }
 
-// SetAppJSON sets the value of AppJSON.
-func (s *CreateApplicationReq) SetAppJSON(val OptString) {
-	s.AppJSON = val
-}
+type CreateApplicationReqRecordAllCalls int
 
-// SetSpeechSynthesisVendor sets the value of SpeechSynthesisVendor.
-func (s *CreateApplicationReq) SetSpeechSynthesisVendor(val OptString) {
-	s.SpeechSynthesisVendor = val
-}
+const (
+	CreateApplicationReqRecordAllCalls0 CreateApplicationReqRecordAllCalls = 0
+	CreateApplicationReqRecordAllCalls1 CreateApplicationReqRecordAllCalls = 1
+)
 
-// SetSpeechSynthesisVoice sets the value of SpeechSynthesisVoice.
-func (s *CreateApplicationReq) SetSpeechSynthesisVoice(val OptString) {
-	s.SpeechSynthesisVoice = val
-}
-
-// SetSpeechRecognizerVendor sets the value of SpeechRecognizerVendor.
-func (s *CreateApplicationReq) SetSpeechRecognizerVendor(val OptString) {
-	s.SpeechRecognizerVendor = val
-}
-
-// SetSpeechRecognizerLanguage sets the value of SpeechRecognizerLanguage.
-func (s *CreateApplicationReq) SetSpeechRecognizerLanguage(val OptString) {
-	s.SpeechRecognizerLanguage = val
+// AllValues returns all CreateApplicationReqRecordAllCalls values.
+func (CreateApplicationReqRecordAllCalls) AllValues() []CreateApplicationReqRecordAllCalls {
+	return []CreateApplicationReqRecordAllCalls{
+		CreateApplicationReqRecordAllCalls0,
+		CreateApplicationReqRecordAllCalls1,
+	}
 }
 
 type CreateApplicationUnprocessableEntity GeneralError
@@ -2404,7 +2350,6 @@ func (s *GeneralError) SetMsg(val string) {
 
 func (*GeneralError) addLimitForAccountRes()                    {}
 func (*GeneralError) addLimitForServiceProviderRes()            {}
-func (*GeneralError) applicationsApplicationSidGetRes()         {}
 func (*GeneralError) checkAvailabilityRes()                     {}
 func (*GeneralError) createServiceProviderRes()                 {}
 func (*GeneralError) createVoipCarrierFromTemplateBySPRes()     {}
@@ -2417,6 +2362,7 @@ func (*GeneralError) generateInviteCodeRes()                    {}
 func (*GeneralError) getAccountApiKeysRes()                     {}
 func (*GeneralError) getAccountLimitsRes()                      {}
 func (*GeneralError) getAccountRes()                            {}
+func (*GeneralError) getApplicationRes()                        {}
 func (*GeneralError) getCallRes()                               {}
 func (*GeneralError) getGoogleCustomVoiceRes()                  {}
 func (*GeneralError) getLeastCostRoutingCarrierSetEntryRes()    {}
@@ -2568,6 +2514,11 @@ func (*GetAccountLimitsOKApplicationJSON) getAccountLimitsRes() {}
 type GetAccountNotFound struct{}
 
 func (*GetAccountNotFound) getAccountRes() {}
+
+// GetApplicationNotFound is response for GetApplication operation.
+type GetApplicationNotFound struct{}
+
+func (*GetApplicationNotFound) getApplicationRes() {}
 
 // GetCallNotFound is response for GetCall operation.
 type GetCallNotFound struct{}
@@ -5004,6 +4955,51 @@ func (s *MsTeamsTenant) SetTenantFqdn(val string) {
 
 func (*MsTeamsTenant) getTenantRes() {}
 
+// NewNilString returns new NilString with value set to v.
+func NewNilString(v string) NilString {
+	return NilString{
+		Value: v,
+	}
+}
+
+// NilString is nullable string.
+type NilString struct {
+	Value string
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilString) SetTo(v string) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilString) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *NilString) SetToNull() {
+	o.Null = true
+	var v string
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilString) Get() (v string, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilString) Or(d string) string {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewNilUUID returns new NilUUID with value set to v.
 func NewNilUUID(v uuid.UUID) NilUUID {
 	return NilUUID{
@@ -5089,52 +5085,6 @@ func (o OptAccount) Get() (v Account, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptAccount) Or(d Account) Account {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptApplication returns new OptApplication with value set to v.
-func NewOptApplication(v Application) OptApplication {
-	return OptApplication{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptApplication is optional Application.
-type OptApplication struct {
-	Value Application
-	Set   bool
-}
-
-// IsSet returns true if OptApplication was set.
-func (o OptApplication) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptApplication) Reset() {
-	var v Application
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptApplication) SetTo(v Application) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptApplication) Get() (v Application, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptApplication) Or(d Application) Application {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -5319,52 +5269,6 @@ func (o OptCreateApikeyReq) Get() (v CreateApikeyReq, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptCreateApikeyReq) Or(d CreateApikeyReq) CreateApikeyReq {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptCreateApplicationReq returns new OptCreateApplicationReq with value set to v.
-func NewOptCreateApplicationReq(v CreateApplicationReq) OptCreateApplicationReq {
-	return OptCreateApplicationReq{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptCreateApplicationReq is optional CreateApplicationReq.
-type OptCreateApplicationReq struct {
-	Value CreateApplicationReq
-	Set   bool
-}
-
-// IsSet returns true if OptCreateApplicationReq was set.
-func (o OptCreateApplicationReq) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptCreateApplicationReq) Reset() {
-	var v CreateApplicationReq
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptCreateApplicationReq) SetTo(v CreateApplicationReq) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptCreateApplicationReq) Get() (v CreateApplicationReq, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptCreateApplicationReq) Or(d CreateApplicationReq) CreateApplicationReq {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -11246,6 +11150,93 @@ type UpdateApplicationNotFound struct{}
 
 func (*UpdateApplicationNotFound) updateApplicationRes() {}
 
+type UpdateApplicationReq struct {
+	Name       string    `json:"name"`
+	AccountSid uuid.UUID `json:"account_sid"`
+	// Application webhook for inbound voice calls.
+	CallHook Webhook `json:"call_hook"`
+	// Webhook for reporting call status events.
+	CallStatusHook Webhook `json:"call_status_hook"`
+	// Application webhook for inbound SMS/MMS.
+	MessagingHook  Webhook                            `json:"messaging_hook"`
+	RecordAllCalls UpdateApplicationReqRecordAllCalls `json:"record_all_calls"`
+}
+
+// GetName returns the value of Name.
+func (s *UpdateApplicationReq) GetName() string {
+	return s.Name
+}
+
+// GetAccountSid returns the value of AccountSid.
+func (s *UpdateApplicationReq) GetAccountSid() uuid.UUID {
+	return s.AccountSid
+}
+
+// GetCallHook returns the value of CallHook.
+func (s *UpdateApplicationReq) GetCallHook() Webhook {
+	return s.CallHook
+}
+
+// GetCallStatusHook returns the value of CallStatusHook.
+func (s *UpdateApplicationReq) GetCallStatusHook() Webhook {
+	return s.CallStatusHook
+}
+
+// GetMessagingHook returns the value of MessagingHook.
+func (s *UpdateApplicationReq) GetMessagingHook() Webhook {
+	return s.MessagingHook
+}
+
+// GetRecordAllCalls returns the value of RecordAllCalls.
+func (s *UpdateApplicationReq) GetRecordAllCalls() UpdateApplicationReqRecordAllCalls {
+	return s.RecordAllCalls
+}
+
+// SetName sets the value of Name.
+func (s *UpdateApplicationReq) SetName(val string) {
+	s.Name = val
+}
+
+// SetAccountSid sets the value of AccountSid.
+func (s *UpdateApplicationReq) SetAccountSid(val uuid.UUID) {
+	s.AccountSid = val
+}
+
+// SetCallHook sets the value of CallHook.
+func (s *UpdateApplicationReq) SetCallHook(val Webhook) {
+	s.CallHook = val
+}
+
+// SetCallStatusHook sets the value of CallStatusHook.
+func (s *UpdateApplicationReq) SetCallStatusHook(val Webhook) {
+	s.CallStatusHook = val
+}
+
+// SetMessagingHook sets the value of MessagingHook.
+func (s *UpdateApplicationReq) SetMessagingHook(val Webhook) {
+	s.MessagingHook = val
+}
+
+// SetRecordAllCalls sets the value of RecordAllCalls.
+func (s *UpdateApplicationReq) SetRecordAllCalls(val UpdateApplicationReqRecordAllCalls) {
+	s.RecordAllCalls = val
+}
+
+type UpdateApplicationReqRecordAllCalls int
+
+const (
+	UpdateApplicationReqRecordAllCalls0 UpdateApplicationReqRecordAllCalls = 0
+	UpdateApplicationReqRecordAllCalls1 UpdateApplicationReqRecordAllCalls = 1
+)
+
+// AllValues returns all UpdateApplicationReqRecordAllCalls values.
+func (UpdateApplicationReqRecordAllCalls) AllValues() []UpdateApplicationReqRecordAllCalls {
+	return []UpdateApplicationReqRecordAllCalls{
+		UpdateApplicationReqRecordAllCalls0,
+		UpdateApplicationReqRecordAllCalls1,
+	}
+}
+
 type UpdateApplicationUnprocessableEntity GeneralError
 
 func (*UpdateApplicationUnprocessableEntity) updateApplicationRes() {}
@@ -13549,8 +13540,8 @@ type Webhook struct {
 	WebhookSid OptUUID       `json:"webhook_sid"`
 	URL        string        `json:"url"`
 	Method     WebhookMethod `json:"method"`
-	Username   OptString     `json:"username"`
-	Password   OptString     `json:"password"`
+	Username   NilString     `json:"username"`
+	Password   NilString     `json:"password"`
 }
 
 // GetWebhookSid returns the value of WebhookSid.
@@ -13569,12 +13560,12 @@ func (s *Webhook) GetMethod() WebhookMethod {
 }
 
 // GetUsername returns the value of Username.
-func (s *Webhook) GetUsername() OptString {
+func (s *Webhook) GetUsername() NilString {
 	return s.Username
 }
 
 // GetPassword returns the value of Password.
-func (s *Webhook) GetPassword() OptString {
+func (s *Webhook) GetPassword() NilString {
 	return s.Password
 }
 
@@ -13594,12 +13585,12 @@ func (s *Webhook) SetMethod(val WebhookMethod) {
 }
 
 // SetUsername sets the value of Username.
-func (s *Webhook) SetUsername(val OptString) {
+func (s *Webhook) SetUsername(val NilString) {
 	s.Username = val
 }
 
 // SetPassword sets the value of Password.
-func (s *Webhook) SetPassword(val OptString) {
+func (s *Webhook) SetPassword(val NilString) {
 	s.Password = val
 }
 

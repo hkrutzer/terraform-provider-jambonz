@@ -220,16 +220,12 @@ func (s *AccountRegistrationHook) encodeFields(e *jx.Encoder) {
 		s.Method.Encode(e)
 	}
 	{
-		if s.Username.Set {
-			e.FieldStart("username")
-			s.Username.Encode(e)
-		}
+		e.FieldStart("username")
+		s.Username.Encode(e)
 	}
 	{
-		if s.Password.Set {
-			e.FieldStart("password")
-			s.Password.Encode(e)
-		}
+		e.FieldStart("password")
+		s.Password.Encode(e)
 	}
 }
 
@@ -284,8 +280,8 @@ func (s *AccountRegistrationHook) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"method\"")
 			}
 		case "username":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Username.Reset()
 				if err := s.Username.Decode(d); err != nil {
 					return err
 				}
@@ -294,8 +290,8 @@ func (s *AccountRegistrationHook) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"username\"")
 			}
 		case "password":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Password.Reset()
 				if err := s.Password.Decode(d); err != nil {
 					return err
 				}
@@ -313,7 +309,7 @@ func (s *AccountRegistrationHook) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000110,
+		0b00011110,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -619,60 +615,31 @@ func (s *Application) encodeFields(e *jx.Encoder) {
 		json.EncodeUUID(e, s.AccountSid)
 	}
 	{
-		if s.CallHook.Set {
-			e.FieldStart("call_hook")
-			s.CallHook.Encode(e)
-		}
+		e.FieldStart("call_hook")
+		s.CallHook.Encode(e)
 	}
 	{
-		if s.CallStatusHook.Set {
-			e.FieldStart("call_status_hook")
-			s.CallStatusHook.Encode(e)
-		}
+		e.FieldStart("call_status_hook")
+		s.CallStatusHook.Encode(e)
 	}
 	{
-		if s.MessagingHook.Set {
-			e.FieldStart("messaging_hook")
-			s.MessagingHook.Encode(e)
-		}
+		e.FieldStart("messaging_hook")
+		s.MessagingHook.Encode(e)
 	}
 	{
-		if s.SpeechSynthesisVendor.Set {
-			e.FieldStart("speech_synthesis_vendor")
-			s.SpeechSynthesisVendor.Encode(e)
-		}
-	}
-	{
-		if s.SpeechSynthesisVoice.Set {
-			e.FieldStart("speech_synthesis_voice")
-			s.SpeechSynthesisVoice.Encode(e)
-		}
-	}
-	{
-		if s.SpeechRecognizerVendor.Set {
-			e.FieldStart("speech_recognizer_vendor")
-			s.SpeechRecognizerVendor.Encode(e)
-		}
-	}
-	{
-		if s.SpeechRecognizerLanguage.Set {
-			e.FieldStart("speech_recognizer_language")
-			s.SpeechRecognizerLanguage.Encode(e)
-		}
+		e.FieldStart("record_all_calls")
+		s.RecordAllCalls.Encode(e)
 	}
 }
 
-var jsonFieldsNameOfApplication = [10]string{
+var jsonFieldsNameOfApplication = [7]string{
 	0: "application_sid",
 	1: "name",
 	2: "account_sid",
 	3: "call_hook",
 	4: "call_status_hook",
 	5: "messaging_hook",
-	6: "speech_synthesis_vendor",
-	7: "speech_synthesis_voice",
-	8: "speech_recognizer_vendor",
-	9: "speech_recognizer_language",
+	6: "record_all_calls",
 }
 
 // Decode decodes Application from json.
@@ -680,7 +647,7 @@ func (s *Application) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode Application to nil")
 	}
-	var requiredBitSet [2]uint8
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -721,8 +688,8 @@ func (s *Application) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"account_sid\"")
 			}
 		case "call_hook":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.CallHook.Reset()
 				if err := s.CallHook.Decode(d); err != nil {
 					return err
 				}
@@ -731,8 +698,8 @@ func (s *Application) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"call_hook\"")
 			}
 		case "call_status_hook":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.CallStatusHook.Reset()
 				if err := s.CallStatusHook.Decode(d); err != nil {
 					return err
 				}
@@ -741,8 +708,8 @@ func (s *Application) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"call_status_hook\"")
 			}
 		case "messaging_hook":
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				s.MessagingHook.Reset()
 				if err := s.MessagingHook.Decode(d); err != nil {
 					return err
 				}
@@ -750,45 +717,15 @@ func (s *Application) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"messaging_hook\"")
 			}
-		case "speech_synthesis_vendor":
+		case "record_all_calls":
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
-				s.SpeechSynthesisVendor.Reset()
-				if err := s.SpeechSynthesisVendor.Decode(d); err != nil {
+				if err := s.RecordAllCalls.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"speech_synthesis_vendor\"")
-			}
-		case "speech_synthesis_voice":
-			if err := func() error {
-				s.SpeechSynthesisVoice.Reset()
-				if err := s.SpeechSynthesisVoice.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"speech_synthesis_voice\"")
-			}
-		case "speech_recognizer_vendor":
-			if err := func() error {
-				s.SpeechRecognizerVendor.Reset()
-				if err := s.SpeechRecognizerVendor.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"speech_recognizer_vendor\"")
-			}
-		case "speech_recognizer_language":
-			if err := func() error {
-				s.SpeechRecognizerLanguage.Reset()
-				if err := s.SpeechRecognizerLanguage.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"speech_recognizer_language\"")
+				return errors.Wrap(err, "decode field \"record_all_calls\"")
 			}
 		default:
 			return d.Skip()
@@ -799,9 +736,8 @@ func (s *Application) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [2]uint8{
-		0b00000111,
-		0b00000000,
+	for i, mask := range [1]uint8{
+		0b01111111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -843,6 +779,38 @@ func (s *Application) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *Application) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ApplicationRecordAllCalls as json.
+func (s ApplicationRecordAllCalls) Encode(e *jx.Encoder) {
+	e.Int(int(s))
+}
+
+// Decode decodes ApplicationRecordAllCalls from json.
+func (s *ApplicationRecordAllCalls) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ApplicationRecordAllCalls to nil")
+	}
+	v, err := d.Int()
+	if err != nil {
+		return err
+	}
+	*s = ApplicationRecordAllCalls(v)
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s ApplicationRecordAllCalls) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ApplicationRecordAllCalls) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -2060,54 +2028,22 @@ func (s *CreateApplicationReq) encodeFields(e *jx.Encoder) {
 		s.CallStatusHook.Encode(e)
 	}
 	{
-		if s.MessagingHook.Set {
-			e.FieldStart("messaging_hook")
-			s.MessagingHook.Encode(e)
-		}
+		e.FieldStart("record_all_calls")
+		s.RecordAllCalls.Encode(e)
 	}
 	{
-		if s.AppJSON.Set {
-			e.FieldStart("app_json")
-			s.AppJSON.Encode(e)
-		}
-	}
-	{
-		if s.SpeechSynthesisVendor.Set {
-			e.FieldStart("speech_synthesis_vendor")
-			s.SpeechSynthesisVendor.Encode(e)
-		}
-	}
-	{
-		if s.SpeechSynthesisVoice.Set {
-			e.FieldStart("speech_synthesis_voice")
-			s.SpeechSynthesisVoice.Encode(e)
-		}
-	}
-	{
-		if s.SpeechRecognizerVendor.Set {
-			e.FieldStart("speech_recognizer_vendor")
-			s.SpeechRecognizerVendor.Encode(e)
-		}
-	}
-	{
-		if s.SpeechRecognizerLanguage.Set {
-			e.FieldStart("speech_recognizer_language")
-			s.SpeechRecognizerLanguage.Encode(e)
-		}
+		e.FieldStart("messaging_hook")
+		s.MessagingHook.Encode(e)
 	}
 }
 
-var jsonFieldsNameOfCreateApplicationReq = [10]string{
+var jsonFieldsNameOfCreateApplicationReq = [6]string{
 	0: "name",
 	1: "account_sid",
 	2: "call_hook",
 	3: "call_status_hook",
-	4: "messaging_hook",
-	5: "app_json",
-	6: "speech_synthesis_vendor",
-	7: "speech_synthesis_voice",
-	8: "speech_recognizer_vendor",
-	9: "speech_recognizer_language",
+	4: "record_all_calls",
+	5: "messaging_hook",
 }
 
 // Decode decodes CreateApplicationReq from json.
@@ -2115,7 +2051,7 @@ func (s *CreateApplicationReq) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode CreateApplicationReq to nil")
 	}
-	var requiredBitSet [2]uint8
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -2163,65 +2099,25 @@ func (s *CreateApplicationReq) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"call_status_hook\"")
 			}
-		case "messaging_hook":
+		case "record_all_calls":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.MessagingHook.Reset()
+				if err := s.RecordAllCalls.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"record_all_calls\"")
+			}
+		case "messaging_hook":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
 				if err := s.MessagingHook.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"messaging_hook\"")
-			}
-		case "app_json":
-			if err := func() error {
-				s.AppJSON.Reset()
-				if err := s.AppJSON.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"app_json\"")
-			}
-		case "speech_synthesis_vendor":
-			if err := func() error {
-				s.SpeechSynthesisVendor.Reset()
-				if err := s.SpeechSynthesisVendor.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"speech_synthesis_vendor\"")
-			}
-		case "speech_synthesis_voice":
-			if err := func() error {
-				s.SpeechSynthesisVoice.Reset()
-				if err := s.SpeechSynthesisVoice.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"speech_synthesis_voice\"")
-			}
-		case "speech_recognizer_vendor":
-			if err := func() error {
-				s.SpeechRecognizerVendor.Reset()
-				if err := s.SpeechRecognizerVendor.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"speech_recognizer_vendor\"")
-			}
-		case "speech_recognizer_language":
-			if err := func() error {
-				s.SpeechRecognizerLanguage.Reset()
-				if err := s.SpeechRecognizerLanguage.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"speech_recognizer_language\"")
 			}
 		default:
 			return d.Skip()
@@ -2232,9 +2128,8 @@ func (s *CreateApplicationReq) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [2]uint8{
-		0b00001111,
-		0b00000000,
+	for i, mask := range [1]uint8{
+		0b00111111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -2276,6 +2171,38 @@ func (s *CreateApplicationReq) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *CreateApplicationReq) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes CreateApplicationReqRecordAllCalls as json.
+func (s CreateApplicationReqRecordAllCalls) Encode(e *jx.Encoder) {
+	e.Int(int(s))
+}
+
+// Decode decodes CreateApplicationReqRecordAllCalls from json.
+func (s *CreateApplicationReqRecordAllCalls) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode CreateApplicationReqRecordAllCalls to nil")
+	}
+	v, err := d.Int()
+	if err != nil {
+		return err
+	}
+	*s = CreateApplicationReqRecordAllCalls(v)
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s CreateApplicationReqRecordAllCalls) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *CreateApplicationReqRecordAllCalls) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -12758,6 +12685,52 @@ func (s *MsTeamsTenant) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes string as json.
+func (o NilString) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes string from json.
+func (o *NilString) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilString to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v string
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	v, err := d.Str()
+	if err != nil {
+		return err
+	}
+	o.Value = string(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilString) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilString) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes uuid.UUID as json.
 func (o NilUUID) Encode(e *jx.Encoder) {
 	if o.Null {
@@ -12833,39 +12806,6 @@ func (s OptAccount) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptAccount) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes Application as json.
-func (o OptApplication) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes Application from json.
-func (o *OptApplication) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptApplication to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptApplication) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptApplication) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -13000,39 +12940,6 @@ func (s OptCreateApikeyReq) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptCreateApikeyReq) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes CreateApplicationReq as json.
-func (o OptCreateApplicationReq) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes CreateApplicationReq from json.
-func (o *OptCreateApplicationReq) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptCreateApplicationReq to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptCreateApplicationReq) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptCreateApplicationReq) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -20413,6 +20320,211 @@ func (s *UpdateApplicationInternalServerError) UnmarshalJSON(data []byte) error 
 	return s.Decode(d)
 }
 
+// Encode implements json.Marshaler.
+func (s *UpdateApplicationReq) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *UpdateApplicationReq) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("name")
+		e.Str(s.Name)
+	}
+	{
+		e.FieldStart("account_sid")
+		json.EncodeUUID(e, s.AccountSid)
+	}
+	{
+		e.FieldStart("call_hook")
+		s.CallHook.Encode(e)
+	}
+	{
+		e.FieldStart("call_status_hook")
+		s.CallStatusHook.Encode(e)
+	}
+	{
+		e.FieldStart("messaging_hook")
+		s.MessagingHook.Encode(e)
+	}
+	{
+		e.FieldStart("record_all_calls")
+		s.RecordAllCalls.Encode(e)
+	}
+}
+
+var jsonFieldsNameOfUpdateApplicationReq = [6]string{
+	0: "name",
+	1: "account_sid",
+	2: "call_hook",
+	3: "call_status_hook",
+	4: "messaging_hook",
+	5: "record_all_calls",
+}
+
+// Decode decodes UpdateApplicationReq from json.
+func (s *UpdateApplicationReq) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode UpdateApplicationReq to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "name":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Str()
+				s.Name = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"name\"")
+			}
+		case "account_sid":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := json.DecodeUUID(d)
+				s.AccountSid = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"account_sid\"")
+			}
+		case "call_hook":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				if err := s.CallHook.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"call_hook\"")
+			}
+		case "call_status_hook":
+			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				if err := s.CallStatusHook.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"call_status_hook\"")
+			}
+		case "messaging_hook":
+			requiredBitSet[0] |= 1 << 4
+			if err := func() error {
+				if err := s.MessagingHook.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"messaging_hook\"")
+			}
+		case "record_all_calls":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				if err := s.RecordAllCalls.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"record_all_calls\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode UpdateApplicationReq")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00111111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfUpdateApplicationReq) {
+					name = jsonFieldsNameOfUpdateApplicationReq[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *UpdateApplicationReq) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *UpdateApplicationReq) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes UpdateApplicationReqRecordAllCalls as json.
+func (s UpdateApplicationReqRecordAllCalls) Encode(e *jx.Encoder) {
+	e.Int(int(s))
+}
+
+// Decode decodes UpdateApplicationReqRecordAllCalls from json.
+func (s *UpdateApplicationReqRecordAllCalls) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode UpdateApplicationReqRecordAllCalls to nil")
+	}
+	v, err := d.Int()
+	if err != nil {
+		return err
+	}
+	*s = UpdateApplicationReqRecordAllCalls(v)
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s UpdateApplicationReqRecordAllCalls) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *UpdateApplicationReqRecordAllCalls) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes UpdateApplicationUnprocessableEntity as json.
 func (s *UpdateApplicationUnprocessableEntity) Encode(e *jx.Encoder) {
 	unwrapped := (*GeneralError)(s)
@@ -25247,16 +25359,12 @@ func (s *Webhook) encodeFields(e *jx.Encoder) {
 		s.Method.Encode(e)
 	}
 	{
-		if s.Username.Set {
-			e.FieldStart("username")
-			s.Username.Encode(e)
-		}
+		e.FieldStart("username")
+		s.Username.Encode(e)
 	}
 	{
-		if s.Password.Set {
-			e.FieldStart("password")
-			s.Password.Encode(e)
-		}
+		e.FieldStart("password")
+		s.Password.Encode(e)
 	}
 }
 
@@ -25311,8 +25419,8 @@ func (s *Webhook) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"method\"")
 			}
 		case "username":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Username.Reset()
 				if err := s.Username.Decode(d); err != nil {
 					return err
 				}
@@ -25321,8 +25429,8 @@ func (s *Webhook) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"username\"")
 			}
 		case "password":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Password.Reset()
 				if err := s.Password.Decode(d); err != nil {
 					return err
 				}
@@ -25340,7 +25448,7 @@ func (s *Webhook) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000110,
+		0b00011110,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

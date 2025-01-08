@@ -13,10 +13,6 @@ type AddSpeechCredentialForSeerviceProviderRes interface {
 	addSpeechCredentialForSeerviceProviderRes()
 }
 
-type ApplicationsApplicationSidGetRes interface {
-	applicationsApplicationSidGetRes()
-}
-
 type ChangePasswordRes interface {
 	changePasswordRes()
 }
@@ -207,6 +203,10 @@ type GetAccountLimitsRes interface {
 
 type GetAccountRes interface {
 	getAccountRes()
+}
+
+type GetApplicationRes interface {
+	getApplicationRes()
 }
 
 type GetCallRes interface {

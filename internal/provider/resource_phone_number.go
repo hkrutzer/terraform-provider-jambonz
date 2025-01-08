@@ -3,12 +3,10 @@ package provider
 import (
 	"context"
 	"fmt"
-	"regexp"
 
 	api "terraform-provider-jambonz/internal/api/generated"
 
 	"github.com/google/uuid"
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -16,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 var (
@@ -90,10 +87,7 @@ func (r *phoneNumberResource) Schema(_ context.Context, _ resource.SchemaRequest
 			"application_sid": schema.StringAttribute{
 				Optional: true,
 				Validators: []validator.String{
-					stringvalidator.RegexMatches(
-						regexp.MustCompile(`(?i)^[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$`),
-						"must be a valid UUID",
-					),
+					UUIDValidator,
 				},
 			},
 		},
@@ -101,7 +95,7 @@ func (r *phoneNumberResource) Schema(_ context.Context, _ resource.SchemaRequest
 }
 
 func (r *phoneNumberResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var plan, state phoneNumberResourceModel
+	var plan, state PhoneNumberResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -174,7 +168,7 @@ func (r *phoneNumberResource) Create(ctx context.Context, req resource.CreateReq
 
 // Read refreshes the Terraform state with the latest data.
 func (r *phoneNumberResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var state phoneNumberResourceModel
+	var state PhoneNumberResourceModel
 	resp.Diagnostics.Append(resp.State.Get(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -227,7 +221,7 @@ func (r *phoneNumberResource) Read(ctx context.Context, req resource.ReadRequest
 }
 
 func (r *phoneNumberResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var plan, state phoneNumberResourceModel
+	var state, plan PhoneNumberResourceModel
 	resp.Diagnostics.Append(resp.State.Get(ctx, &state)...)
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
@@ -248,10 +242,7 @@ func (r *phoneNumberResource) Update(ctx context.Context, req resource.UpdateReq
 		x.ApplicationSid.SetToNull()
 	}
 
-	tflog.Info(ctx, fmt.Sprintf("state: %+v", state))
-	tflog.Info(ctx, fmt.Sprintf("UPDATEREQ: %v %+v", x, updatePhoneNumber))
-
-	res1, err := r.client.UpdatePhoneNumber(ctx, &x, updatePhoneNumber)
+	_, err := r.client.UpdatePhoneNumber(ctx, &x, updatePhoneNumber)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error updating phone number",
@@ -259,8 +250,6 @@ func (r *phoneNumberResource) Update(ctx context.Context, req resource.UpdateReq
 		)
 		return
 	}
-
-	tflog.Info(ctx, fmt.Sprintf("UPDATERES: %v %+v", res1, err))
 
 	// Read the resource back because the API doesn't return anything
 	res, err := r.client.GetPhoneNumber(ctx, api.GetPhoneNumberParams{
@@ -295,7 +284,7 @@ func (r *phoneNumberResource) Update(ctx context.Context, req resource.UpdateReq
 }
 
 func (r *phoneNumberResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state phoneNumberResourceModel
+	var state PhoneNumberResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -318,7 +307,7 @@ func (r *phoneNumberResource) ImportState(ctx context.Context, req resource.Impo
 	resource.ImportStatePassthroughID(ctx, path.Root("phone_number_sid"), req, resp)
 }
 
-type phoneNumberResourceModel struct {
+type PhoneNumberResourceModel struct {
 	PhoneNumberSID types.String `tfsdk:"phone_number_sid"`
 	PhoneNumber    types.String `tfsdk:"phone_number"`
 	VoipCarrierSID types.String `tfsdk:"voip_carrier_sid"`
