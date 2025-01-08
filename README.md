@@ -1,6 +1,9 @@
 # Jambonz Terraform Provider
+[![Terraform Registry](https://img.shields.io/github/v/release/hkrutzer/terraform-provider-jambonz?color=5e4fe3&label=Terraform%20Registry&logo=terraform&sort=semver)](https://registry.terraform.io/providers/hkrutzer/jambonz/latest)
 
 _Unofficial_ Terraform provider for [jambonz](https://jambonz.org/)
+
+- [Documentation](https://registry.terraform.io/providers/hkrutzer/jambonz/latest/docs)
 
 ## Using the provider
 
