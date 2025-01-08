@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
   title: Jambonz REST API
   description: Jambonz REST API specification
@@ -3738,6 +3738,7 @@ paths:
       summary: create application
       operationId: createApplication
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -3755,25 +3756,19 @@ paths:
                 call_status_hook:
                   $ref: '#/components/schemas/Webhook'
                   description: webhook to report call status events
+                record_all_calls:
+                  type: integer
+                  enum: [0, 1]
                 messaging_hook:
                   $ref: '#/components/schemas/Webhook'
                   description: application webhook to handle inbound SMS/MMS messages
-                app_json:
-                   type: string
-                   description: Voice Application Json, call_hook will not be invoked if app_json is provided
-                speech_synthesis_vendor:
-                  type: string
-                speech_synthesis_voice:
-                  type: string
-                speech_recognizer_vendor:
-                  type: string
-                speech_recognizer_language:
-                  type: string
               required:
                 - name
                 - account_sid
                 - call_hook
                 - call_status_hook
+                - messaging_hook
+                - record_all_calls
       responses:
         201:
           description: application successfully created
@@ -3855,6 +3850,7 @@ paths:
       tags:
        - Applications
       summary: retrieve an application
+      operationId: getApplication
       responses:
         200:
           description: application found
@@ -3876,10 +3872,40 @@ paths:
       summary: update application
       operationId: updateApplication
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Application'
+              type: object
+              properties:
+                # We copy the schema in here because we
+                # the API errors out when application_sid is set
+                name:
+                  type: string
+                account_sid:
+                  type: string
+                  format: uuid
+                call_hook:
+                  $ref: '#/components/schemas/Webhook'
+                  description: application webhook for inbound voice calls
+                call_status_hook:
+                  $ref: '#/components/schemas/Webhook'
+                  description: webhook for reporting call status events
+                messaging_hook:
+                  $ref: '#/components/schemas/Webhook'
+                  description: application webhook for inbound SMS/MMS
+                record_all_calls:
+                  type: integer
+                  enum: [0, 1]
+              required:
+                # - application_sid
+                - name
+                - account_sid
+                - call_hook
+                - call_status_hook
+                - messaging_hook
+                - record_all_calls
+              # $ref: '#/components/schemas/Application'
       responses:
         204:
           description: application updated
@@ -5368,26 +5394,21 @@ components:
           description: application webhook for inbound voice calls
         call_status_hook:
           $ref: '#/components/schemas/Webhook'
-          description: webhhok for reporting call status events
+          description: webhook for reporting call status events
         messaging_hook:
-          nullable: true
-          allOf:
-            - $ref: '#/components/schemas/Webhook'
+          $ref: '#/components/schemas/Webhook'
           description: application webhook for inbound SMS/MMS
-        speech_synthesis_vendor:
-          type: string
-        speech_synthesis_voice:
-          type: string
-        speech_recognizer_vendor:
-          type: string
-        speech_recognizer_language:
-          type: string
+        record_all_calls:
+          type: integer
+          enum: [0, 1]
       required:
         - application_sid
         - name
         - account_sid
         - call_hook
         - call_status_hook
+        - messaging_hook
+        - record_all_calls
     ApiKey:
       type: object
       properties:
@@ -5473,11 +5494,15 @@ components:
           default: POST
         username:
           type: string
+          nullable: true
         password:
           type: string
+          nullable: true
       required:
         - url
         - method
+        - username
+        - password
       example: {"url": "https://acme.com", "method": "POST"}
     MsTeamsTenant:
       type: object

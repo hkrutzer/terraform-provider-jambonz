@@ -134,6 +134,7 @@ func (p *JambonzProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 func (p *JambonzProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		NewApplicationResource,
 		NewPhoneNumberResource,
 	}
 }

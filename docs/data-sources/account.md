@@ -39,10 +39,13 @@ data "jambonz_account" "my_account" {
 <a id="nestedatt--registration_hook"></a>
 ### Nested Schema for `registration_hook`
 
+Optional:
+
+- `password` (String, Sensitive)
+- `username` (String)
+
 Read-Only:
 
 - `method` (String)
-- `password` (String)
 - `url` (String)
-- `username` (String)
 - `webhook_sid` (String)
