@@ -924,7 +924,8 @@ type CreateApplicationReq struct {
 	// Webhook to report call status events.
 	CallStatusHook Webhook                            `json:"call_status_hook"`
 	RecordAllCalls CreateApplicationReqRecordAllCalls `json:"record_all_calls"`
-	MessagingHook  Webhook                            `json:"messaging_hook"`
+	// Application webhook to handle inbound SMS/MMS messages.
+	MessagingHook Webhook `json:"messaging_hook"`
 }
 
 // GetName returns the value of Name.
